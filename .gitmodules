@@ -7,8 +7,8 @@
 	url = https://github.com/volodymyrsamotiy/sonic-linux-kernel
 [submodule "sonic-sairedis"]
 	path = src/sonic-sairedis
-	url = https://github.com/volodymyrsamotiy/sonic-sairedis
-    branch = 202205
+	url = https://github.com/arfeigin/sonic-sairedis
+    branch = fastreboot_over_warmreboot_4a91238b0
 [submodule "sonic-swss"]
 	path = src/sonic-swss
 	url = https://github.com/volodymyrsamotiy/sonic-swss
@@ -33,8 +33,8 @@
 	url = https://github.com/p4lang/ptf.git
 [submodule "src/sonic-utilities"]
 	path = src/sonic-utilities
-	url = https://github.com/volodymyrsamotiy/sonic-utilities
-    branch = 202205
+	url = https://github.com/arfeigin/sonic-utilities
+    branch = fastreboot_over_warmreboot_4a91238b0
 [submodule "platform/broadcom/sonic-platform-modules-arista"]
 	path = platform/broadcom/sonic-platform-modules-arista
 	url = https://github.com/aristanetworks/sonic
