@@ -8,8 +8,8 @@
     branch = 202205
 [submodule "sonic-sairedis"]
 	path = src/sonic-sairedis
-	url = https://github.com/Azure/sonic-sairedis
-    branch = 202205
+	url = https://github.com/arfeigin/sonic-sairedis
+    branch = fastreboot_improvements_202205_2
 [submodule "sonic-swss"]
 	path = src/sonic-swss
 	url = https://github.com/Azure/sonic-swss
@@ -34,8 +34,8 @@
 	url = https://github.com/p4lang/ptf.git
 [submodule "src/sonic-utilities"]
 	path = src/sonic-utilities
-	url = https://github.com/Azure/sonic-utilities
-    branch = 202205
+	url = https://github.com/arfeigin/sonic-utilities
+    branch = fastreboot_improvements_202205_2
 [submodule "platform/broadcom/sonic-platform-modules-arista"]
 	path = platform/broadcom/sonic-platform-modules-arista
 	url = https://github.com/aristanetworks/sonic
