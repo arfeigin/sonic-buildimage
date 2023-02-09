@@ -111,6 +111,7 @@ function finalize_fast_reboot()
 {
     debug "Finalizing fast-reboot..."
     sonic-db-cli STATE_DB SET "FAST_REBOOT|system" "disable" &>/dev/null
+    sonic-db-cli CONFIG_DB DEL "WARM_RESTART|teamd" &>/dev/null
 }
 
 function stop_control_plane_assistant()
