@@ -60,7 +60,8 @@ function check_warm_boot()
 
 function check_fast_boot()
 {
-    if [[ $($SONIC_DB_CLI STATE_DB GET "FAST_REBOOT|system") == "1" ]]; then
+    SYSTEM_FAST_REBOOT=`sonic-db-cli STATE_DB GET "FAST_RESTART_ENABLE_TABLE|system"`
+    if [[ ${SYSTEM_FAST_REBOOT} == "enable" ]]; then
         FAST_BOOT="true"
     else
         FAST_BOOT="false"
@@ -284,8 +285,8 @@ stop() {
     # encountered error, e.g. syncd crashed. And swss needs to
     # be restarted.
     if [[ x"$FAST_BOOT" != x"true" ]]; then
-        debug "Clearing FAST_REBOOT flag..."
-        clean_up_tables STATE_DB "'FAST_REBOOT*'"
+        debug "Clearing FAST_RESTART_ENABLE_TABLE flag..."
+        sonic-db-cli STATE_DB SET "FAST_RESTART_ENABLE_TABLE|system" "disable"
     fi
     # Unlock has to happen before reaching out to peer service
     unlock_service_state_change
