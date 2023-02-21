@@ -709,4 +709,5 @@ def is_fast_reboot_enabled():
     elif stdout:
         fb_system_state = stdout.rstrip('\n')
 
+    fb_system_state = True if fb_system_state == "enable" else False
     return fb_system_state
