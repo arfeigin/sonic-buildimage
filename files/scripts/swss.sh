@@ -285,7 +285,7 @@ stop() {
     # encountered error, e.g. syncd crashed. And swss needs to
     # be restarted.
     if [[ x"$FAST_BOOT" != x"true" ]]; then
-        debug "Clearing FAST_REBOOT flag..."
+        debug "Clearing FAST_RESTART_ENABLE_TABLE flag..."
         sonic-db-cli STATE_DB SET "FAST_RESTART_ENABLE_TABLE|system" "disable"
     fi
     # Unlock has to happen before reaching out to peer service
