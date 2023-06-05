@@ -1,7 +1,7 @@
 [submodule "sonic-swss-common"]
 	path = src/sonic-swss-common
-	url = https://github.com/sonic-net/sonic-swss-common
-    branch = 202205
+	url = https://github.com/arfeigin/sonic-swss-common
+    branch = fpmsyncd_wa_frb
 [submodule "sonic-linux-kernel"]
 	path = src/sonic-linux-kernel
 	url = https://github.com/sonic-net/sonic-linux-kernel
@@ -12,8 +12,8 @@
     branch = 202205
 [submodule "sonic-swss"]
 	path = src/sonic-swss
-	url = https://github.com/sonic-net/sonic-swss
-    branch = 202205
+	url = https://github.com/arfeigin/sonic-swss
+    branch = fpmsyncd_wa_frb
 [submodule "src/p4c-bm/p4c-bm"]
 	path = platform/p4/p4c-bm/p4c-bm
 	url = https://github.com/krambn/p4c-bm
