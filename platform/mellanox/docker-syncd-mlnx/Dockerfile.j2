@@ -31,6 +31,8 @@ RUN apt-get update && \
         python3-dev \
         python-is-python3 \
         python3-jsonschema \
+        bpftrace \
+        linux-libc-dev \
 {%- if ENABLE_ASAN == "y" %}
         libasan6 \
 {%- endif %}

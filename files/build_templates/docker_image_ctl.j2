@@ -592,6 +592,7 @@ start() {
         -v mlnx_sdk_socket:/var/run/sx_sdk \
         -v /tmp/nv-syncd-shared/:/tmp \
         -v /dev/shm:/dev/shm:rw \
+        -v /etc/sonic/bpf/sx_sdk_py_tests/tools/bpf_api_tracer:/bpf_api_tracer:rw \
         -v /var/log/sai_failure_dump:/var/log/sai_failure_dump:rw \
         -e SX_API_SOCKET_FILE=/var/run/sx_sdk/sx_api.sock \
 {%- elif docker_container_name == "pmon" %}
