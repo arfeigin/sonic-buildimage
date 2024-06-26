@@ -1,13 +1,13 @@
 # Mellanox SAI
 
-MLNX_SAI_VERSION = SAIBuild2405.28.0.33
+MLNX_SAI_VERSION = sonic2311_SAIBuild2311.28.0.13_port_admin_up
 MLNX_SAI_ASSETS_GITHUB_URL = https://github.com/Mellanox/Spectrum-SDK-Drivers-SONiC-Bins
 MLNX_SAI_ASSETS_RELEASE_TAG = sai-$(MLNX_SAI_VERSION)-$(BLDENV)-$(CONFIGURED_ARCH)
 MLNX_SAI_ASSETS_URL = $(MLNX_SAI_ASSETS_GITHUB_URL)/releases/download/$(MLNX_SAI_ASSETS_RELEASE_TAG)
 MLNX_SAI_DEB_VERSION = $(subst -,.,$(subst _,.,$(MLNX_SAI_VERSION)))
 
 # Place here URL where SAI sources exist
-MLNX_SAI_SOURCE_BASE_URL = 
+MLNX_SAI_SOURCE_BASE_URL = https://git-nbu-sw.nvidia.com/r/plugins/gitiles/switchx/sai_interface/+/refs/heads/sonic2311_SAIBuild2311.28.0.13_port_admin_up
 
 ifneq ($(MLNX_SAI_SOURCE_BASE_URL), )
 SAI_FROM_SRC = y
