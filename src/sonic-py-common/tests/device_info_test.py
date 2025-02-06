@@ -107,7 +107,8 @@ class TestDeviceInfo(object):
             result = device_info.get_chassis_info()
             truth = {"serial": SonicV2Connector.TEST_SERIAL,
                      "model": SonicV2Connector.TEST_MODEL,
-                     "revision": SonicV2Connector.TEST_REV}
+                     "revision": SonicV2Connector.TEST_REV,
+                     "sys_display": SonicV2Connector.TEST_SYS_DISPLAY}
             assert result == truth
 
     @mock.patch("os.path.isfile")
