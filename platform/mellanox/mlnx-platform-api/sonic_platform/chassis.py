@@ -27,6 +27,8 @@ try:
     from sonic_platform_base.chassis_base import ChassisBase
     from sonic_py_common.logger import Logger
     import os
+    import subprocess
+    from sonic_py_common import device_info
     from functools import reduce
     from .utils import extract_RJ45_ports_index
     from . import module_host_mgmt_initializer
@@ -56,6 +58,9 @@ REBOOT_CAUSE_READY_FILE = '/run/hw-management/config/reset_attr_ready'
 REBOOT_TYPE_KEXEC_FILE = "/proc/cmdline"
 REBOOT_TYPE_KEXEC_PATTERN_WARM = ".*SONIC_BOOT_TYPE=(warm|fastfast).*"
 REBOOT_TYPE_KEXEC_PATTERN_FAST = ".*SONIC_BOOT_TYPE=(fast|fast-reboot).*"
+
+SPC_RETRIEVAL = "lspci | grep 'Mellanox Technologies'"
+SYS_DISPLAY = "SYS_DISPLAY"
 
 # Global logger class instance
 logger = Logger()
@@ -327,7 +332,7 @@ class Chassis(ChassisBase):
         Returns:
             A list of objects derived from SfpBase representing all sfps
             available on this chassis
-        """    
+        """
         if DeviceDataManager.is_module_host_management_mode():
             self.module_host_mgmt_initializer.initialize(self)
         else:
@@ -407,7 +412,7 @@ class Chassis(ChassisBase):
         else:
             self.initialize_sfp()
             return self.get_change_event_legacy(timeout)
-            
+
     def get_change_event_for_module_host_management_mode(self, timeout):
         """Get SFP change event when module host management mode is enabled.
 
@@ -439,9 +444,9 @@ class Chassis(ChassisBase):
                     self.registered_fds[fd.fileno()] = (s.sdk_index, fd, fd_type)
 
             logger.log_debug(f'Registered SFP file descriptors for polling: {self.registered_fds}')
-                    
+
         from . import sfp
-        
+
         wait_forever = (timeout == 0)
         # poll timeout should be no more than 1000ms to ensure fast shutdown flow
         timeout = 1000.0 if timeout >= 1000 else float(timeout)
@@ -449,14 +454,14 @@ class Chassis(ChassisBase):
         error_dict = {}
         begin = time.monotonic()
         wait_ready_task = sfp.SFP.get_wait_ready_task()
-        
-        while True:        
+
+        while True:
             fds_events = self.poll_obj.poll(timeout)
             for fileno, _ in fds_events:
                 if fileno not in self.registered_fds:
                     logger.log_error(f'Unknown file no {fileno} from poll event, registered files are {self.registered_fds}')
                     continue
-                
+
                 sfp_index, fd, fd_type = self.registered_fds[fileno]
                 s = self._sfp_list[sfp_index]
                 fd.seek(0)
@@ -480,7 +485,7 @@ class Chassis(ChassisBase):
                         # FW control cable got an error, no need trigger state machine
                         sfp_status, error_desc = s.get_error_info_from_sdk_error_type()
                         port_dict[sfp_index + 1] = sfp_status
-                        if error_desc: 
+                        if error_desc:
                             error_dict[sfp_index + 1] = error_desc
                         continue
                     elif str(fd_value) == sfp.SFP_STATUS_INSERTED:
@@ -496,14 +501,14 @@ class Chassis(ChassisBase):
                     # event could be EVENT_POWER_GOOD or EVENT_POWER_BAD
                     event = sfp.EVENT_POWER_BAD if fd_value == 0 else sfp.EVENT_POWER_GOOD
                     s.on_event(event)
-                    
+
                 if s.in_stable_state():
                     self.sfp_module.SFP.wait_sfp_eeprom_ready([s], 2)
                     s.fill_change_event(port_dict)
                     s.refresh_poll_obj(self.poll_obj, self.registered_fds)
                 else:
                     logger.log_debug(f'SFP {sfp_index} does not reach stable state, state={s.state}')
-                    
+
             ready_sfp_set = wait_ready_task.get_ready_set()
             for sfp_index in ready_sfp_set:
                 s = self._sfp_list[sfp_index]
@@ -514,7 +519,7 @@ class Chassis(ChassisBase):
                     s.refresh_poll_obj(self.poll_obj, self.registered_fds)
                 else:
                     logger.log_error(f'SFP {sfp_index} failed to reach stable state, state={s.state}')
-                    
+
             if port_dict:
                 logger.log_notice(f'Sending SFP change event: {port_dict}, error event: {error_dict}')
                 self.reinit_sfps(port_dict)
@@ -561,23 +566,23 @@ class Chassis(ChassisBase):
                 self.sfp_states_before_first_poll[s.sdk_index] = s.get_module_status()
 
             logger.log_debug(f'Registered SFP file descriptors for polling: {self.registered_fds}')
-            
+
         from . import sfp
-        
+
         wait_forever = (timeout == 0)
         # poll timeout should be no more than 1000ms to ensure fast shutdown flow
         timeout = 1000.0 if timeout >= 1000 else float(timeout)
         port_dict = {}
         error_dict = {}
         begin = time.monotonic()
-        
+
         while True:
             fds_events = self.poll_obj.poll(timeout)
             for fileno, _ in fds_events:
                 if fileno not in self.registered_fds:
                     logger.log_error(f'Unknown file no {fileno} from poll event, registered files are {self.registered_fds}')
                     continue
-                
+
                 sfp_index, fd = self.registered_fds[fileno]
                 fd.seek(0)
                 fd.read()
@@ -742,8 +747,15 @@ class Chassis(ChassisBase):
         Returns:
             string: Model/part number of device
         """
-        self.initialize_eeprom()
-        return self._eeprom.get_part_number()
+        model = None
+        if self._read_from_vpd:
+            if not self.vpd_data:
+                self.vpd_data = self._parse_vpd_data(VPD_DATA_FILE)
+            model = self.vpd_data.get(SYS_DISPLAY, "N/A")
+        else:
+            self.initialize_eeprom()
+            model = self._eeprom.get_part_number()
+        return model
 
     def get_base_mac(self):
         """
@@ -938,11 +950,23 @@ class Chassis(ChassisBase):
                 return result
 
             result = utils.read_key_value_file(filename, delimeter=": ")
-                
+
         except Exception as e:
             logger.log_error("Fail to decode vpd_data {} due to {}".format(filename, repr(e)))
 
         return result
+
+    def _get_spectrum_revision(self):
+        p = subprocess.Popen(SPC_RETRIEVAL, universal_newlines=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out, err = p.communicate()
+        spc_revision = re.search('Spectrum-[1-9]{1}', out)
+        if spc_revision is None:
+            spc_revision = 1
+        return int(spc_revision)
+
+    def _read_from_vpd(self):
+        spc_revision = self._get_spectrum_revision()
+        return (spc_revision >= 4)
 
     def _verify_reboot_cause(self, filename):
         '''
