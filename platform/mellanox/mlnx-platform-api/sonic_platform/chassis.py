@@ -27,8 +27,7 @@ try:
     from sonic_platform_base.chassis_base import ChassisBase
     from sonic_py_common.logger import Logger
     import os
-    import subprocess
-    from sonic_py_common import device_info
+    from subprocess import check_output
     from functools import reduce
     from .utils import extract_RJ45_ports_index
     from . import module_host_mgmt_initializer
@@ -748,7 +747,7 @@ class Chassis(ChassisBase):
             string: Model/part number of device
         """
         model = None
-        if self._read_from_vpd:
+        if self._read_from_vpd():
             if not self.vpd_data:
                 self.vpd_data = self._parse_vpd_data(VPD_DATA_FILE)
             model = self.vpd_data.get(SYS_DISPLAY, "N/A")
@@ -957,12 +956,12 @@ class Chassis(ChassisBase):
         return result
 
     def _get_spectrum_revision(self):
-        p = subprocess.Popen(SPC_RETRIEVAL, universal_newlines=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        out, err = p.communicate()
-        spc_revision = re.search('Spectrum-[1-9]{1}', out)
-        if spc_revision is None:
-            spc_revision = 1
-        return int(spc_revision)
+        out = check_output(SPC_RETRIEVAL, shell=True)
+        spc_revision = 1
+        spc_match = re.search('Spectrum-([1-9](?!\d))', out.decode("utf-8"))
+        if spc_match is not None:
+            spc_revision = int(spc_match.group(1))
+        return spc_revision
 
     def _read_from_vpd(self):
         spc_revision = self._get_spectrum_revision()
