@@ -1,5 +1,6 @@
 #
-# Copyright (c) 2021 NVIDIA CORPORATION & AFFILIATES.
+# SPDX-FileCopyrightText: NVIDIA CORPORATION & AFFILIATES
+# Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,6 +34,7 @@ from sonic_platform.eeprom import Eeprom, EepromContentVisitor
 class TestEeprom:
     @patch('os.path.exists', MagicMock(return_value=True))
     @patch('os.path.islink', MagicMock(return_value=True))
+    @patch('sonic_platform.chassis.Chassis._read_model_from_vpd', MagicMock(return_value=False))
     @patch('sonic_platform.eeprom.Eeprom.get_system_eeprom_info')
     @patch('sonic_platform.chassis.extract_RJ45_ports_index', MagicMock(return_value=[]))
     def test_chassis_eeprom(self, mock_eeprom_info):
@@ -73,7 +75,7 @@ class TestEeprom:
             return return_values.get((key, field))
         eeprom = Eeprom()
         eeprom._redis_hget = MagicMock(side_effect = side_effect)
-        
+
         info = eeprom.get_system_eeprom_info()
         assert eeprom.get_product_name() == 'MSN3420'
         assert eeprom.get_part_number() == 'MSN3420-CB2FO'
@@ -84,7 +86,7 @@ class TestEeprom:
 
     @patch('os.path.exists', MagicMock(return_value=True))
     @patch('os.path.islink', MagicMock(return_value=True))
-    def test_get_system_eeprom_info_from_hardware(self):    
+    def test_get_system_eeprom_info_from_hardware(self):
         eeprom = Eeprom()
         eeprom.p = os.path.join(test_path, 'mock_eeprom_data')
         eeprom._redis_hget = MagicMock()
