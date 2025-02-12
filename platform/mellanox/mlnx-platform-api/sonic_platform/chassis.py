@@ -747,7 +747,7 @@ class Chassis(ChassisBase):
             string: Model/part number of device
         """
         model = None
-        if self._read_from_vpd():
+        if self._read_model_from_vpd():
             if not self.vpd_data:
                 self.vpd_data = self._parse_vpd_data(VPD_DATA_FILE)
             model = self.vpd_data.get(SYS_DISPLAY, "N/A")
@@ -955,17 +955,29 @@ class Chassis(ChassisBase):
 
         return result
 
-    def _get_spectrum_revision(self):
+    def _get_spectrum_version(self):
+        """
+        Returns spectrum version of the platform
+
+        Returns:
+            Returns spectrum version of the platform
+        """
         out = check_output(SPC_RETRIEVAL, shell=True)
-        spc_revision = 1
+        spc_version = 1
         spc_match = re.search('Spectrum-([1-9](?!\d))', out.decode("utf-8"))
         if spc_match is not None:
-            spc_revision = int(spc_match.group(1))
-        return spc_revision
+            spc_version = int(spc_match.group(1))
+        return spc_version
 
-    def _read_from_vpd(self):
-        spc_revision = self._get_spectrum_revision()
-        return (spc_revision >= 4)
+    def _read_model_from_vpd(self):
+        """
+        Returns if model number should be returned from VPD file
+
+        Returns:
+            Returns True if spectrum version is higher than Spectrum-4
+        """
+        spc_version = self._get_spectrum_version()
+        return (spc_version >= 4)
 
     def _verify_reboot_cause(self, filename):
         '''
