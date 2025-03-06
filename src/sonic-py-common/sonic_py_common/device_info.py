@@ -47,6 +47,7 @@ CHASSIS_INFO_CARD_NUM_FIELD = 'module_num'
 CHASSIS_INFO_SERIAL_FIELD = 'serial'
 CHASSIS_INFO_MODEL_FIELD = 'model'
 CHASSIS_INFO_REV_FIELD = 'revision'
+CHASSIS_INFO_SYS_DISPLAY_FIELD = 'sys_display'
 
 # DPU constants
 DPU_NAME_PREFIX = "dpu"
@@ -558,6 +559,7 @@ def get_chassis_info():
         chassis_info_dict['serial'] = db.get(db.STATE_DB, table, CHASSIS_INFO_SERIAL_FIELD)
         chassis_info_dict['model'] = db.get(db.STATE_DB, table, CHASSIS_INFO_MODEL_FIELD)
         chassis_info_dict['revision'] = db.get(db.STATE_DB, table, CHASSIS_INFO_REV_FIELD)
+        chassis_info_dict['sys_display'] = db.get(db.STATE_DB, table, CHASSIS_INFO_SYS_DISPLAY_FIELD)
     except Exception:
         pass
 
