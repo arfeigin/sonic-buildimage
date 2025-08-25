@@ -32,7 +32,16 @@ else
 SDK_FROM_SRC = n
 endif
 
-export MLNX_SDK_SOURCE_BASE_URL MLNX_SDK_VERSION MLNX_SDK_ISSU_VERSION MLNX_SDK_DEB_VERSION MLNX_ASSETS_GITHUB_URL MLNX_SDK_DRIVERS_GITHUB_URL
+# Place here URL where alternate SDK assets exist
+MLNX_SDK_ASSETS_BASE_URL =
+
+ifneq ($(MLNX_SDK_ASSETS_BASE_URL), )
+SDK_ASSETS_FROM_URL = y
+else
+SDK_ASSETS_FROM_URL = n
+endif
+
+export MLNX_SDK_SOURCE_BASE_URL MLNX_SDK_VERSION MLNX_SDK_ISSU_VERSION MLNX_SDK_DEB_VERSION MLNX_ASSETS_GITHUB_URL MLNX_SDK_DRIVERS_GITHUB_URL MLNX_SDK_ASSETS_BASE_URL
 
 MLNX_SDK_RDEBS += $(SYSSDK)
 MLNX_SDK_DEBS += $(SYSSDK_DEV)
@@ -60,7 +69,14 @@ $(eval $(call add_derived_package,$(SX_KERNEL),$(SX_KERNEL_DEV)))
 
 define make_url
 	$(1)_URL = $(MLNX_SDK_ASSETS_URL)/$(1)
+endef
 
+define make_assets_url
+	$(1)_URL = $(MLNX_SDK_ASSETS_BASE_URL)/$(1)
+endef
+
+define check_url_available
+$(shell wget --spider --quiet --timeout=10 --tries=1 $(1) 2>/dev/null && echo "y" || echo "n")
 endef
 
 $(eval $(foreach deb,$(MLNX_SDK_DEBS) $(MLNX_SDK_RDEBS) $(PYTHON_SDK_API),$(call make_url,$(deb))))
@@ -68,7 +84,21 @@ $(eval $(foreach deb,$(MLNX_SDK_DEBS) $(MLNX_SDK_RDEBS) $(PYTHON_SDK_API),$(call
 SONIC_MAKE_DEBS += $(SX_KERNEL)
 
 ifeq ($(SDK_FROM_SRC), y)
-SONIC_MAKE_DEBS += $(MLNX_SDK_RDEBS) $(PYTHON_SDK_API)
+# if SDK_ASSETS are available from alternate URL, consume RDEBS from there
+ifeq ($(SDK_ASSETS_FROM_URL), y)
+$(MLNX_SDK_RDEBS)_URL = $(MLNX_SDK_ASSETS_BASE_URL)/$(MLNX_SDK_RDEBS)
+SONIC_ONLINE_DEBS += $(MLNX_SDK_RDEBS)
+else
+# Check if RDEBS are available in GitHub first, then fallback to source, consume them if available
+GITHUB_RDEBS_AVAILABLE := $(call check_url_available,$(MLNX_SDK_ASSETS_URL)/$(MLNX_SDK_RDEBS))
+ifeq ($(GITHUB_RDEBS_AVAILABLE), y)
+SONIC_ONLINE_DEBS += $(MLNX_SDK_RDEBS)
+else
+SONIC_MAKE_DEBS += $(MLNX_SDK_RDEBS)
+endif
+endif
+# Always build PYTHON_SDK_API from source when SDK_FROM_SRC=y
+SONIC_MAKE_DEBS += $(PYTHON_SDK_API)
 else
 SONIC_ONLINE_DEBS += $(MLNX_SDK_RDEBS) $(PYTHON_SDK_API)
 endif
