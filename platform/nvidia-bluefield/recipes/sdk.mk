@@ -26,7 +26,11 @@ SDK_COLLECTX_URL = https://linux.mellanox.com/public/repo/doca/1.5.2/debian12/aa
 SDK_GH_BASE_URL = https://github.com/Mellanox/sonic-bluefield-packages/releases/download/dpu-sdk-$(SDK_VERSION)-$(BLDENV)/
 
 define make_url_sdk
+	ifneq ($(MLNX_SDK_ASSETS_BASE_URL), )
+	$(1)_URL="$(MLNX_SDK_ASSETS_BASE_URL)/$(1)"
+else
 	$(1)_URL="$(SDK_GH_BASE_URL)/$(1)"
+endif
 
 endef
 
@@ -35,14 +39,18 @@ define get_sdk_version_file_gh
 
 endef
 
+SDK_VERSIONS_FILE = $(PLATFORM_PATH)/sdk-src/VERSIONS
+
 ifneq ($(SDK_SOURCE_BASE_URL), )
 SDK_FROM_SRC = y
 SDK_SOURCE_URL = $(SDK_SOURCE_BASE_URL)/$(subst -,/,$(SDK_VERSION))
-SDK_VERSIONS_FILE = $(PLATFORM_PATH)/sdk-src/VERSIONS
 $(eval $(call get_sdk_version_file_gh, "$(SDK_SOURCE_URL)/VERSIONS_FOR_SONIC_BUILD", $(SDK_VERSIONS_FILE)))
+else ifneq ($(MLNX_SDK_ASSETS_BASE_URL), )
+SDK_FROM_SRC = n
+SDK_SOURCE_URL = $(MLNX_SDK_ASSETS_BASE_URL)/$(subst -,/,$(SDK_VERSION))
+$(eval $(call get_sdk_version_file_gh, "$(MLNX_SDK_ASSETS_BASE_URL)/VERSIONS_FOR_SONIC_BUILD", $(SDK_VERSIONS_FILE)))
 else
 SDK_FROM_SRC = n
-SDK_VERSIONS_FILE = $(PLATFORM_PATH)/sdk-src/VERSIONS
 $(eval $(call get_sdk_version_file_gh, "$(SDK_GH_BASE_URL)/VERSIONS_FOR_SONIC_BUILD", $(SDK_VERSIONS_FILE)))
 endif
 
