@@ -23,11 +23,21 @@ MLNX_SDK_ASSETS_RELEASE_TAG = sdk-$(MLNX_SDK_VERSION)-$(BLDENV)-$(CONFIGURED_ARC
 MLNX_SDK_ASSETS_URL = $(MLNX_ASSETS_GITHUB_URL)/releases/download/$(MLNX_SDK_ASSETS_RELEASE_TAG)
 MLNX_SDK_DEB_VERSION = $(subst -,.,$(subst _,.,$(MLNX_SDK_VERSION)))
 
+# Place here URL where alternate SDK assets exist
+MLNX_SDK_ASSETS_BASE_URL =
+ifneq ($(MLNX_SDK_ASSETS_BASE_URL), )
+MLNX_SDK_ASSETS_URL = $(MLNX_SDK_ASSETS_BASE_URL)
+endif
+
 # Place here URL where SDK sources exist
 MLNX_SDK_SOURCE_BASE_URL =
 
 ifneq ($(MLNX_SDK_SOURCE_BASE_URL), )
+ifeq ($(MLNX_SDK_ASSETS_BASE_URL), )
 SDK_FROM_SRC = y
+else
+SDK_FROM_SRC = n
+endif
 else
 SDK_FROM_SRC = n
 endif
