@@ -1,6 +1,7 @@
 #
-# Copyright (c) 2016-2025 NVIDIA CORPORATION & AFFILIATES.
-# Apache-2.0
+# SPDX-FileCopyrightText: NVIDIA CORPORATION & AFFILIATES
+# Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,13 +24,20 @@ MLNX_SDK_ASSETS_RELEASE_TAG = sdk-$(MLNX_SDK_VERSION)-$(BLDENV)-$(CONFIGURED_ARC
 MLNX_SDK_ASSETS_URL = $(MLNX_ASSETS_GITHUB_URL)/releases/download/$(MLNX_SDK_ASSETS_RELEASE_TAG)
 MLNX_SDK_DEB_VERSION = $(subst -,.,$(subst _,.,$(MLNX_SDK_VERSION)))
 
+# Place here URL where alternate SDK assets exist
+MLNX_SDK_ASSETS_BASE_URL =
+ifneq ($(MLNX_SDK_ASSETS_BASE_URL), )
+MLNX_SDK_ASSETS_URL = $(MLNX_SDK_ASSETS_BASE_URL)
+endif
+
 # Place here URL where SDK sources exist
 MLNX_SDK_SOURCE_BASE_URL =
 
+SDK_FROM_SRC = n
+ifeq ($(MLNX_SDK_ASSETS_BASE_URL), )
 ifneq ($(MLNX_SDK_SOURCE_BASE_URL), )
 SDK_FROM_SRC = y
-else
-SDK_FROM_SRC = n
+endif
 endif
 
 export MLNX_SDK_SOURCE_BASE_URL MLNX_SDK_VERSION MLNX_SDK_ISSU_VERSION MLNX_SDK_DEB_VERSION MLNX_ASSETS_GITHUB_URL MLNX_SDK_DRIVERS_GITHUB_URL
