@@ -26,19 +26,15 @@ MLNX_SDK_DEB_VERSION = $(subst -,.,$(subst _,.,$(MLNX_SDK_VERSION)))
 
 # Place here URL where alternate SDK assets exist
 MLNX_SDK_ASSETS_BASE_URL =
-ifneq ($(MLNX_SDK_ASSETS_BASE_URL), )
-MLNX_SDK_ASSETS_URL = $(MLNX_SDK_ASSETS_BASE_URL)
-endif
 
 # Place here URL where SDK sources exist
 MLNX_SDK_SOURCE_BASE_URL =
 
-SDK_FROM_SRC = n
-ifeq ($(MLNX_SDK_ASSETS_BASE_URL), )
-ifneq ($(MLNX_SDK_SOURCE_BASE_URL), )
-SDK_FROM_SRC = y
-endif
-endif
+# Use alternate assets URL if provided, otherwise use default
+MLNX_SDK_ASSETS_URL = $(if $(MLNX_SDK_ASSETS_BASE_URL),$(MLNX_SDK_ASSETS_BASE_URL),$(MLNX_SDK_ASSETS_URL))
+
+# Use source build if no assets URL is provided but source URL is available
+SDK_FROM_SRC = $(if $(MLNX_SDK_ASSETS_BASE_URL),n,$(if $(MLNX_SDK_SOURCE_BASE_URL),y,n))
 
 export MLNX_SDK_SOURCE_BASE_URL MLNX_SDK_VERSION MLNX_SDK_ISSU_VERSION MLNX_SDK_DEB_VERSION MLNX_ASSETS_GITHUB_URL MLNX_SDK_DRIVERS_GITHUB_URL
 

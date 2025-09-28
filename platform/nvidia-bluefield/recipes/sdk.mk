@@ -28,11 +28,9 @@ SDK_GH_BASE_URL = https://github.com/Mellanox/sonic-bluefield-packages/releases/
 
 # Place here URL where alternate SDK assets exist
 SDK_ASSETS_BASE_URL =
-ifneq ($(SDK_ASSETS_BASE_URL), )
-SDK_ASSETS_URL = $(SDK_ASSETS_BASE_URL)
-else
-SDK_ASSETS_URL = $(SDK_GH_BASE_URL)
-endif
+
+# Use alternate assets URL if provided, otherwise use GitHub URL
+SDK_ASSETS_URL = $(if $(SDK_ASSETS_BASE_URL),$(SDK_ASSETS_BASE_URL),$(SDK_GH_BASE_URL))
 
 define make_url_sdk
 	$(1)_URL="$(SDK_ASSETS_URL)/$(1)"
@@ -44,12 +42,10 @@ define get_sdk_version_file_gh
 
 endef
 
+# Use source build if source URL is provided and no assets URL is set
+SDK_FROM_SRC = $(if $(SDK_SOURCE_BASE_URL),$(if $(SDK_ASSETS_BASE_URL),n,y),n)
+
 ifneq ($(SDK_SOURCE_BASE_URL), )
-ifeq ($(SDK_ASSETS_BASE_URL), )
-SDK_FROM_SRC = y
-else
-SDK_FROM_SRC = n
-endif
 SDK_SOURCE_URL = $(SDK_SOURCE_BASE_URL)/$(subst -,/,$(SDK_VERSION))
 SDK_VERSIONS_FILE = $(PLATFORM_PATH)/sdk-src/VERSIONS
 $(eval $(call get_sdk_version_file_gh, "$(SDK_SOURCE_URL)/VERSIONS_FOR_SONIC_BUILD", $(SDK_VERSIONS_FILE)))
