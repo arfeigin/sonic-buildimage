@@ -30,8 +30,10 @@ MLNX_SDK_ASSETS_BASE_URL =
 # Place here URL where SDK sources exist
 MLNX_SDK_SOURCE_BASE_URL =
 
-# Use alternate assets URL if provided, otherwise use default
-MLNX_SDK_ASSETS_URL = $(if $(MLNX_SDK_ASSETS_BASE_URL),$(MLNX_SDK_ASSETS_BASE_URL),$(MLNX_SDK_ASSETS_URL))
+# Use alternate assets URL if provided
+ifneq ($(MLNX_SDK_ASSETS_BASE_URL), )
+MLNX_SDK_ASSETS_URL = $(MLNX_SDK_ASSETS_BASE_URL)
+endif
 
 # Use source build if no assets URL is provided but source URL is available
 SDK_FROM_SRC = $(if $(MLNX_SDK_ASSETS_BASE_URL),n,$(if $(MLNX_SDK_SOURCE_BASE_URL),y,n))
