@@ -36,12 +36,16 @@ RUN apt-get update && \
         libxml2 \
         python3-pip \
         python3-dev \
+        python3-setuptools \
         python3-jsonschema \
         python-is-python3 \
         pciutils
 
 RUN pip3 install --upgrade pip
 RUN apt-get purge -y python-pip
+
+# Remove python3-distutils to use setuptools instead
+RUN apt-get remove -y python3-distutils || true
 
 {% if docker_syncd_mlnx_debs.strip() -%}
 # Copy locally-built Debian package dependencies

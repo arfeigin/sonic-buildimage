@@ -41,6 +41,7 @@ RUN apt-get update        \
     libboost-atomic1.74.0 \
     python3-pip           \
     python3-dev           \
+    python3-setuptools    \
     python-is-python3     \
     python3-scapy         \
     libnanomsg5           \
@@ -51,6 +52,9 @@ RUN apt-get update        \
     pciutils
 
 RUN pip3 install --upgrade pip
+
+# Remove python3-distutils to use setuptools instead
+RUN apt-get remove -y python3-distutils || true
 
 {% if docker_syncd_mlnx_rpc_debs.strip() -%}
 # Copy locally-built Debian package dependencies
