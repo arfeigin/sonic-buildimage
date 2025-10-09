@@ -6,7 +6,8 @@
 	url = git@github.com:nvidia-sonic/sonic-linux-kernel.git
 [submodule "sonic-sairedis"]
 	path = src/sonic-sairedis
-	url = git@github.com:nvidia-sonic/sonic-sairedis.git
+	url = git@github.com:arfeigin/sonic-sairedis.git
+	branch = 202405_sai_sniffer_default
 [submodule "sonic-swss"]
 	path = src/sonic-swss
 	url = git@github.com:arfeigin/sonic-swss.git
