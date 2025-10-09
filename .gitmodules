@@ -3,7 +3,8 @@
 	url = git@github.com:nvidia-sonic/sonic-swss-common.git
 [submodule "sonic-linux-kernel"]
 	path = src/sonic-linux-kernel
-	url = git@github.com:nvidia-sonic/sonic-linux-kernel.git
+	url = git@github.com:arfeigin/sonic-linux-kernel.git
+	branch = 202405
 [submodule "sonic-sairedis"]
 	path = src/sonic-sairedis
 	url = git@github.com:arfeigin/sonic-sairedis.git
