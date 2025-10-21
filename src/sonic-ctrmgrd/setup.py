@@ -26,7 +26,7 @@ setup(
         'pytest-cov',
         'sonic-py-common',
     ],
-    install_requires=['netaddr==0.8.0', 'pyyaml', 'docker'],
+    install_requires=['netaddr==0.8.0', 'pyyaml'],
     license="GNU General Public License v3",
     long_description=readme + '\n\n',
     include_package_data=True,
@@ -35,6 +35,6 @@ setup(
     packages=find_packages(),
     setup_requires=setup_requirements,
     version='1.0.0',
-    scripts=['ctrmgr/container', 'ctrmgr/ctrmgr_tools.py', 'ctrmgr/kube_commands.py', 'ctrmgr/ctrmgrd.py', 'ctrmgr/docker-wait-any'],
+    scripts=['ctrmgr/container', 'ctrmgr/ctrmgr_tools.py', 'ctrmgr/kube_commands.py', 'ctrmgr/ctrmgrd.py'],
     zip_safe=False,
 )
